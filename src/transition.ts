@@ -1,0 +1,76 @@
+export enum HandleStatus {
+  REJECT,
+  RESOLVED,
+  PENDING,
+  UNRESOLVED
+}
+
+export interface Route {
+  name: string,
+  path: String
+  fullPath: string,
+  matched: any[],
+  params: object,
+  query: object
+}
+
+export interface Transition {
+  to: Route | null,
+  from: Route | null,
+  next: () => void,
+  abort: (reason?: object | Error) => void,
+  redirect: (route: object | string) => void
+}
+
+export class HandlerTansition implements Transition {
+
+  private transition: Transition
+
+  public status: HandleStatus
+
+  public context: object
+
+  constructor(transition: Transition, context: object) {
+    this.context = JSON.parse(JSON.stringify(context))
+    this.transition = transition
+  }
+
+  get to() {
+    return this.transition.to
+  }
+
+  get from() {
+    return this.transition.from
+  }
+
+  get isNotResolved() {
+    return this.status === HandleStatus.UNRESOLVED
+  }
+
+  next() {
+    if (this.isNotResolved) {
+      this.status = HandleStatus.RESOLVED
+      this.transition.next()
+    }
+  }
+
+  abort(reason: any) {
+    if (this.isNotResolved) {
+      this.status = HandleStatus.REJECT
+      reason ? this.transition.abort(reason) : this.transition.abort()
+    }
+  }
+
+  redirect(route: string | object) {
+    if (this.isNotResolved) {
+      this.status = HandleStatus.REJECT
+      this.transition.redirect(route)
+    }
+  }
+
+  pending() {
+    if (this.isNotResolved) {
+      this.status = HandleStatus.PENDING
+    }
+  }
+}
