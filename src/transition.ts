@@ -33,6 +33,7 @@ export class HandlerTansition implements Transition {
   constructor(transition: Transition, context: object) {
     this.context = JSON.parse(JSON.stringify(context))
     this.transition = transition
+    this.status= HandleStatus.UNRESOLVED
   }
 
   get to() {
@@ -47,28 +48,28 @@ export class HandlerTansition implements Transition {
     return this.status === HandleStatus.UNRESOLVED
   }
 
-  next() {
+  next = () => {
     if (this.isNotResolved) {
       this.status = HandleStatus.RESOLVED
       this.transition.next()
     }
   }
 
-  abort(reason: any) {
+  abort = (reason: any) => {
     if (this.isNotResolved) {
       this.status = HandleStatus.REJECT
       reason ? this.transition.abort(reason) : this.transition.abort()
     }
   }
 
-  redirect(route: string | object) {
+  redirect = (route: string | object) => {
     if (this.isNotResolved) {
       this.status = HandleStatus.REJECT
       this.transition.redirect(route)
     }
   }
 
-  pending() {
+  pending = () => {
     if (this.isNotResolved) {
       this.status = HandleStatus.PENDING
     }

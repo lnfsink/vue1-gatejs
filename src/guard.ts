@@ -26,7 +26,7 @@ export class Guard {
   private equals: Map<any, Function> = new Map()
   private cb: GuardCallback
   
-  public canActivate: BaseCallback = () => true
+  public canActivate: BaseCallback
 
   constructor (gate: Gate, canActivate?: BaseCallback) {
     this.gate = gate
