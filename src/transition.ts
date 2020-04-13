@@ -17,7 +17,7 @@ export interface Route {
 export interface Transition {
   to: Route | null,
   from: Route | null,
-  next: () => void,
+  next: (param?: any) => void,
   abort: (reason?: object | Error) => void,
   redirect: (route: object | string) => void
 }
@@ -48,10 +48,10 @@ export class HandlerTansition implements Transition {
     return this.status === HandleStatus.UNRESOLVED
   }
 
-  next = () => {
+  next = (route: any) => {
     if (this.isNotResolved) {
       this.status = HandleStatus.RESOLVED
-      this.transition.next()
+      this.transition.next(route)
     }
   }
 
